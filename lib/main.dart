@@ -29,23 +29,32 @@ class Sample extends StatelessWidget {
         child: ElevatedButton(
           child: const Icon(Icons.north),
           onPressed: () {
+            print("Pressed");
+            http.get(Uri.parse('https://iocontrol.ru/api/readData/esp32cam/x')).then((response) {
+              print("Response status: ${response.statusCode}");
+              print("Response body: ${response.body}");
+            }).catchError((error) {
+              print("Error: $error");
+            });
             showDialog(
               context: context,
               builder: (context) => Dialog(
-                child: FutureBuilder(
+                child: Padding(child: FutureBuilder(
                   future: http.get(
                     Uri.parse('https://iocontrol.ru/api/readData/esp32cam/x'),
                   ),
-                  builder: (context, snapshot) {
+                  builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData) {
-                      return Text(snapshot.data!);
+                      return Text(snapshot.data!.body);
                     } else if (snapshot.hasError) {
-                      return const Text('Error');
+                      return const Text('ERROR');
                     } else {
                       return const CircularProgressIndicator();
                     }
                   },
                 ),
+                padding: const EdgeInsets.all(15),
+              ),
               ),
             );
           },
